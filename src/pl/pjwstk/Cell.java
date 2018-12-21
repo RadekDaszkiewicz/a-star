@@ -1,4 +1,3 @@
-package pl.pjwstk;
 
 public class Cell {
 
