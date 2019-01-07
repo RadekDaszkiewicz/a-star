@@ -1,31 +1,36 @@
 import java.awt.geom.Point2D;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.PriorityQueue;
 
 public class AStar {
+	boolean solutionFound;
 	Node startNode;
 	Node destinationNode;
 	Node[][] grid;
-	PriorityQueue<Node> openNodes = new PriorityQueue<>((n1, n2) -> {
-		if (n1.finalCost < n2.finalCost) {
+	Comparator<Node> heuristicFunction = (n1, n2) -> {
+		if (n1.heuristicCost < n2.heuristicCost) {
 			return -1;
-		} else if (n1.finalCost > n2.finalCost) {
+		} else if (n1.heuristicCost > n2.heuristicCost) {
 			return 1;
 		} else {
-			if (n1.heuristicCost < n2.heuristicCost) {
+			if (n1.gCost < n2.gCost) {
 				return -1;
-			} else if (n1.heuristicCost > n2.heuristicCost) {
+			} else if (n1.gCost > n2.gCost) {
 				return 1;
 			} else {
 				return 0;
 			}
 		}
-	});
+	};
+	PriorityQueue<Node> openNodes = new PriorityQueue<>(this.heuristicFunction);
+	LinkedList<Node> closedNodes = new LinkedList<>();
 
 	AStar(Point2D.Double startPoint, Point2D.Double destinationPoint, int size, int[][] blocked) {
 		this.grid = new Node[size][size];
 		this.destinationNode = new Node(Node.State.DESTINATION, destinationPoint, destinationPoint);
 		this.startNode = new Node(Node.State.START, startPoint, destinationPoint);
-		this.startNode.gCost = 0.0;     //todo
+		this.startNode.updateGCost(0);
 		this.openNodes.add(this.startNode);
 		//inicjalizacja siatki z heurystykami
 		for (int x = 0; x < this.grid.length; x++) {
@@ -48,10 +53,14 @@ public class AStar {
 	}
 
 	void process() {
+		this.closedNodes.forEach(n -> n.state = Node.State.CLOSED);
 		Node current = this.openNodes.poll();
-		current.state = Node.State.CLOSED; //todo
+		if (current.state == Node.State.DESTINATION) {
+			this.solutionFound = true;
+		}
+		this.closedNodes.add(current);
 		updateNeighbours(current);
-		System.out.println(current);
+		current.markAsSolutionNode();
 	}
 
 	void updateNeighbours(Node node) {
@@ -62,8 +71,8 @@ public class AStar {
 					if (n.gCost == null || newGCost < n.gCost) {
 						n.updateGCost(newGCost);
 						n.parent = node;
-						n.state = Node.State.OPEN;
-						this.openNodes.add(n);
+						if (!this.openNodes.contains(n)) this.openNodes.add(n);
+						if (n.state == Node.State.UNVISITED) n.state = Node.State.OPEN;
 					}
 		});
 	}
@@ -93,6 +102,19 @@ public class AStar {
 				node.neighbours.add(this.grid[(int) node.coordinates.getX() + 1][(int) node.coordinates.getY() + 1]);
 			}
 		}
+	}
+
+	void printNodes() {
+		this.closedNodes.stream()
+				.filter(n -> n.state != Node.State.CLOSED)
+				.forEach(System.out::println);
+		System.out.println("------------------------------------------");
+		this.openNodes.stream()
+				.filter(n -> n.state != Node.State.BLOCKED)
+				.sorted(this.heuristicFunction)
+				.limit(8)
+				.forEachOrdered(System.out::println);
+		System.out.println("==========================================");
 	}
 
 	void display() {
@@ -131,5 +153,7 @@ public class AStar {
 			}
 			System.out.println();
 		}
+		System.out.println();
+		printNodes();
 	}
 }
