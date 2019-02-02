@@ -16,10 +16,6 @@ public class Node {
 	double heuristicCost; // dystans od punktu docelowego
 	Double gCost; // dystans od punktu startowego
 	Double finalCost; // heuristicCost + gCost
-//
-//	public Node(Point2D.Double coordinates) {
-//		this.coordinates = coordinates;
-//	}
 
 	public Node(State state, Point2D.Double coordinates) {
 		this.state = state;
@@ -38,10 +34,6 @@ public class Node {
 		this.finalCost = this.heuristicCost + this.gCost;
 		roundCosts();
 	}
-//
-//	void setHeuristicCost(Node destination) {
-//		this.heuristicCost = this.coordinates.distance(destination.coordinates);
-//	}
 
 	void setHeuristicCost(Point2D.Double destination) {
 		this.heuristicCost = this.coordinates.distance(destination);
@@ -54,28 +46,11 @@ public class Node {
 		}
 	}
 
-//	String createNeighboursData() {
-//		StringBuilder builder = new StringBuilder();
-//		if (this.neighbours != null) {
-//			this.neighbours.stream()
-//					.filter(n -> n.state != State.BLOCKED)
-//					.forEach(Node::toString);
-//		}
-//		return builder.toString();
-//	}
-
 	void roundCosts() {
 		this.gCost = this.gCost != null ? new BigDecimal(this.gCost).setScale(1, BigDecimal.ROUND_HALF_UP).doubleValue() : null;
 		this.heuristicCost = new BigDecimal(this.heuristicCost).setScale(1, BigDecimal.ROUND_HALF_UP).doubleValue();
 		this.finalCost = this.finalCost != null ? new BigDecimal(this.finalCost).setScale(1, BigDecimal.ROUND_HALF_UP).doubleValue() : null;
 	}
-
-//	public void printParent() {
-//		if (this.parent != null) {
-//			System.out.println(this.parent);
-//			this.parent.printParent();
-//		}
-//	}
 
 	@Override
 	public boolean equals(Object o) {

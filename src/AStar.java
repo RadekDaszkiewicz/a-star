@@ -9,14 +9,14 @@ public class AStar {
 	Node destinationNode;
 	Node[][] grid;
 	Comparator<Node> heuristicFunction = (n1, n2) -> {
-		if (n1.heuristicCost < n2.heuristicCost) {
+		if (n1.finalCost < n2.finalCost) {
 			return -1;
-		} else if (n1.heuristicCost > n2.heuristicCost) {
+		} else if (n1.finalCost > n2.finalCost) {
 			return 1;
 		} else {
-			if (n1.gCost < n2.gCost) {
+			if (n1.heuristicCost< n2.heuristicCost) {
 				return -1;
-			} else if (n1.gCost > n2.gCost) {
+			} else if (n1.heuristicCost> n2.heuristicCost) {
 				return 1;
 			} else {
 				return 0;
@@ -58,8 +58,8 @@ public class AStar {
 		if (current.state == Node.State.DESTINATION) {
 			this.solutionFound = true;
 		}
-		this.closedNodes.add(current);
 		updateNeighbours(current);
+		this.closedNodes.add(current);
 		current.markAsSolutionNode();
 	}
 
@@ -154,6 +154,6 @@ public class AStar {
 			System.out.println();
 		}
 		System.out.println();
-		printNodes();
+//		printNodes();
 	}
 }
